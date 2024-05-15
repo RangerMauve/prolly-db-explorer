@@ -1,6 +1,6 @@
 module github.com/RangerMauve/ipti
 
-go 1.22.0
+go 1.22
 
 require (
 	github.com/RangerMauve/ipld-prolly-indexer v0.0.0-20240515190331-cdf67d744101
