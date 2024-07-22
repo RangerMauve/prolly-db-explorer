@@ -315,6 +315,14 @@ func valueAsString(valueNode ipld.Node) (string, error) {
 		}
 
 		return strconv.Itoa(int(value)), nil
+	} else if kind == datamodel.Kind_Float {
+		value, err := valueNode.AsFloat()
+
+		if err != nil {
+			return "", err
+		}
+
+		return strconv.FormatFloat(float64(value), 'f', -1, 32), nil
 	} else {
 		return "", fmt.Errorf("unable to convert IPLD nodes to csv string %q", kind)
 	}
