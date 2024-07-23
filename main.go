@@ -453,15 +453,28 @@ func ingestCSV(ctx context.Context, source io.Reader, collection *indexer.Collec
 				qp.MapEntry(ma, "index", qp.Int(int64(index)))
 			}
 			for fieldIndex, fieldValue := range record {
+				fieldName := headers[fieldIndex]
 				nb := basicnode.Prototype__Any{}.NewBuilder()
+
+				if strings.Compare(fieldValue, "") == 0 {
+					qp.MapEntry(ma, fieldName, qp.String(""))
+					continue
+				}
 				err := dagjson.Decode(nb, strings.NewReader(fieldValue))
 
 				// If it wasn't json, it's just a string
 				if err != nil {
-					qp.MapEntry(ma, headers[fieldIndex], qp.String(fieldValue))
+					qp.MapEntry(ma, fieldName, qp.String(fieldValue))
 				} else {
 					value := nb.Build()
-					qp.MapEntry(ma, headers[fieldIndex], qp.Node(value))
+
+					kind := value.Kind()
+
+					if kind != datamodel.Kind_Float && kind != datamodel.Kind_Int {
+						qp.MapEntry(ma, fieldName, qp.String(fieldValue))
+						continue
+					}
+					qp.MapEntry(ma, fieldName, qp.Node(value))
 				}
 			}
 		})
